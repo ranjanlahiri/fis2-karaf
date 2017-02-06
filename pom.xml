@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-core</artifactId>
-		</dependency>
+		</dependency><!-- 
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-cxf</artifactId>
@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-camel</artifactId>
-		</dependency>
+		</dependency>  -->
 		<!-- <dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
