@@ -48,13 +48,24 @@
         xmlns="http://camel.apache.org/schema/blueprint" xmlns:order="http://fabric8.com/examples/order/v7">
 
         <!-- a route to generate a random order every 5th second -->
-        <route id="generate-order">
-            <from id="route-timer" uri="timer:order?period=5000"/>
-            <bean id="route-generate-order" method="generateOrder" ref="orderGenerator"/>
+        <route id="sendClaimDataRoute">
+            <from id="route-file-input" uri="file:/deployments/work"/>
+            <!-- <bean id="route-generate-order" method="generateOrder" ref="orderGenerator"/>
             <setHeader headerName="Exchange.FILE_NAME" id="route-header-file-name">
                 <method method="generateFileName" ref="orderGenerator"/>
-            </setHeader>
-            <to id="route-to-jms-input" uri="file:work/jms/input"/>
+            </setHeader> -->
+            <log id="routeLog" message="input: ${body}"/>
+            <inOnly id="route-to-amq" uri="activemq:sendClaimDataOut"/>
+        </route>
+
+
+		<route id="logSendClaimData">
+            <from id="route-from-amq" uri="activemq:sendClaimDataOut"/>
+            <!-- <bean id="route-generate-order" method="generateOrder" ref="orderGenerator"/>
+            <setHeader headerName="Exchange.FILE_NAME" id="route-header-file-name">
+                <method method="generateFileName" ref="orderGenerator"/>
+            </setHeader> -->
+            <log id="routeLog" message="Output: ${body}"/>            
         </route>
 
         <!--
@@ -67,13 +78,14 @@
       Files that are consumed from the work/jms/input directory, are then sent to the JMS queue incomingOrders on the
       ActiveMQ broker.
     -->
+    <!-- 
         <route id="file-to-jms-route">
             <from id="route-from-jms-input" uri="file:work/jms/input"/>
             <log id="route-log-order" message="Receiving order ${file:name}"/>
             <to id="route-to-incoming-orders" uri="activemq:incomingOrders"/>
         </route>
 
-
+ -->
     <!--
       This route consumes messages from the JMS queue incomingOrders on the ActiveMQ broker within the ESB.
 
@@ -82,6 +94,8 @@
       moved to a directory for that country. The <otherwise/> element ensures that any file that does not meet the
       requirements for either of the <when/> elements will be moved to the work/jms/output/others directory.
     -->
+    
+    <!-- 
         <route id="jms-cbr-route" streamCache="true">
             <from id="route-from-incoming-orders" uri="activemq:incomingOrders"/>
             <choice id="route-choice-country">
@@ -102,6 +116,6 @@
             </choice>
             <log id="route-final-log" message="Done processing ${file:name}"/>
         </route>
-
+ -->
     </camelContext>
 </blueprint>
