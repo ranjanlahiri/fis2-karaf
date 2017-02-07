@@ -49,7 +49,7 @@
 
         <!-- a route to generate a random order every 5th second -->
         <route id="sendClaimDataRoute">
-            <from id="route-file-input" uri="file:/deployments/work"/>
+            <from id="route-file-input" uri="file:/deployments/work?readLock=changed" />
             <!-- <bean id="route-generate-order" method="generateOrder" ref="orderGenerator"/>
             <setHeader headerName="Exchange.FILE_NAME" id="route-header-file-name">
                 <method method="generateFileName" ref="orderGenerator"/>
