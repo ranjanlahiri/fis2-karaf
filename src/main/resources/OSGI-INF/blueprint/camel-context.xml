@@ -54,7 +54,7 @@
             <setHeader headerName="Exchange.FILE_NAME" id="route-header-file-name">
                 <method method="generateFileName" ref="orderGenerator"/>
             </setHeader> -->
-            <log id="routeLog" message="input: ${body}"/>
+            <log id="routeLogInput" message="input: ${body}"/>
             <inOnly id="route-to-amq" uri="activemq:sendClaimDataOut"/>
         </route>
 
@@ -65,7 +65,7 @@
             <setHeader headerName="Exchange.FILE_NAME" id="route-header-file-name">
                 <method method="generateFileName" ref="orderGenerator"/>
             </setHeader> -->
-            <log id="routeLog" message="Output: ${body}"/>            
+            <log id="routeLogOutput" message="Output: ${body}"/>            
         </route>
 
         <!--
