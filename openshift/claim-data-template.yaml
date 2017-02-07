@@ -1,0 +1,297 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: claimdata
+  
+parameters:
+   - name: GIT_REPO
+     value: https://github.com/ranjanlahiri/fis2-karaf.git
+     required: true
+     description: "Source repository, required"
+   - name: GIT_REF
+     value: master
+     required: true
+     description: "Source repository ref"
+   - name: ACTIVEMQ_USERNAME
+     required: true
+     description: "A-MQ username"
+   - name: ACTIVEMQ_PASSWORD
+     required: true
+     description: "A-MQ password"   
+     
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: null
+    labels:
+      app: fis2karaf
+      delete: fis
+    name: fis2karaf
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: fis2karaf:latest
+    postCommit: {}
+    resources: {}
+    source:
+      git:
+        ref: ${GIT_REF}
+        uri: ${GIT_REPO}
+      secrets: null
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: fis-karaf-openshift:2.0
+          namespace: openshift
+      type: Source
+    triggers:
+    - generic:
+        secret: 0583917e00e24b6e
+      type: Generic
+    - github:
+        secret: 2bea15a668b8d39d
+      type: GitHub
+    - imageChange: {}
+      type: ImageChange
+    - type: ConfigChange
+
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: work
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+        
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 6
+    labels:
+      app: amq62-basic
+      application: broker
+      delete: amq
+      template: amq62-basic
+      xpaas: 1.3.1
+    name: broker-amq
+  spec:
+    replicas: 1
+    selector:
+      deploymentConfig: broker-amq
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 0
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          application: broker
+          deploymentConfig: broker-amq
+        name: broker-amq
+      spec:
+        containers:
+        - env:
+          - name: AMQ_USER
+            value: ${ACTIVEMQ_USERNAME}
+          - name: AMQ_PASSWORD
+            value: ${ACTIVEMQ_PASSWORD}
+          - name: AMQ_TRANSPORTS
+            value: openwire
+          - name: AMQ_QUEUES
+          - name: AMQ_TOPICS
+          - name: MQ_SERIALIZABLE_PACKAGES
+          - name: AMQ_MESH_DISCOVERY_TYPE
+            value: kube
+          - name: AMQ_MESH_SERVICE_NAME
+            value: broker-amq-tcp
+          - name: AMQ_MESH_SERVICE_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: AMQ_STORAGE_USAGE_LIMIT
+            value: 100 gb
+          image: registry.access.redhat.com/jboss-amq-6/amq62-openshift:latest
+          imagePullPolicy: Always
+          name: broker-amq
+          ports:
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          - containerPort: 5672
+            name: amqp
+            protocol: TCP
+          - containerPort: 1883
+            name: mqtt
+            protocol: TCP
+          - containerPort: 61613
+            name: stomp
+            protocol: TCP
+          - containerPort: 61616
+            name: tcp
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - /opt/amq/bin/readinessProbe.sh
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 60
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - broker-amq
+        from:
+          kind: ImageStreamTag
+          name: jboss-amq-62:1.3
+          namespace: openshift
+      type: ImageChange
+    - type: ConfigChange
+
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: fis2karaf
+      delete: fis
+    name: fis2karaf
+  spec:
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: fis2karaf:latest
+      generation: null
+      importPolicy: {}
+      name: latest
+    
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: null
+    generation: 25
+    labels:
+      app: fis2karaf
+      delete: fis
+    name: fis2karaf
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: fis2karaf
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: fis2karaf
+          delete: fis
+          deploymentconfig: fis2karaf
+      spec:
+        containers:
+        - env:
+          - name: ACTIVEMQ_SERVICE_NAME
+            value: broker-amq-tcp
+          - name: ACTIVEMQ_USERNAME
+            value: ${ACTIVEMQ_USERNAME}
+          - name: ACTIVEMQ_PASSWORD
+            value: ${ACTIVEMQ_PASSWORD}
+          - name: AB_JOLOKIA_AUTH_OPENSHIFT
+            value: "false"
+          - name: AB_JOLOKIA_PASSWORD
+            value: somethingS3cure
+          image: fis2karaf:latest
+          imagePullPolicy: Always
+          name: fis2karaf
+          ports:
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          resources:
+            limits:
+              memory: 768Mi
+            requests:
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /deployments/work
+            name: work
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: work
+          persistentVolumeClaim:
+            claimName: work
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - fis2karaf
+        from:
+          kind: ImageStreamTag
+          name: fis2karaf:latest
+      type: ImageChange
+    - type: ConfigChange
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: The broker's OpenWire port.
+    creationTimestamp: null
+    labels:
+      app: amq62-basic
+      application: broker
+      delete: amq
+      template: amq62-basic
+      xpaas: 1.3.1
+    name: broker-amq-tcp
+  spec:
+    ports:
+    - port: 61616
+      protocol: TCP
+      targetPort: 61616
+    selector:
+      deploymentConfig: broker-amq
+    sessionAffinity: None
+    type: ClusterIP
