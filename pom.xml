@@ -67,10 +67,11 @@
 			<artifactId>postgresql</artifactId>
 			<version>${postgresql.version}</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>	
-		</dependency>
+		</dependency> -->
 		<!-- Karaf microcontainer dependencies -->
 		<dependency>
 			<!-- scope is compile so all features (there is only one) are installed 
@@ -200,12 +201,13 @@
 						<feature>openshift-client</feature>
 						<feature>fabric8-karaf-blueprint</feature>
 						<feature>fabric8-karaf-checks</feature>
-						
+						<!-- 
 						<feature>camel-jaxb</feature> 
 						<feature>camel-cxf</feature> 
 						<feature>camel-jdbc</feature> 
 						<feature>cxf</feature> 
 						<feature>camel-http</feature>
+						 -->
 						<!-- <bundle>wrap:mvn:postgresql/postgresql/${postgresql.version}</bundle> -->	
 					</startupFeatures>
 					<startupBundles>						
