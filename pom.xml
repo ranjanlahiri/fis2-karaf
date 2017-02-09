@@ -26,7 +26,7 @@
 		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<fabric8.maven.plugin.version>3.1.80.redhat-000004</fabric8.maven.plugin.version>
-		<postgresql.version>9.1-901.jdbc4</postgresql.version>
+		<!-- <postgresql.version>9.1-901.jdbc4</postgresql.version> -->
 	</properties>
 
 	<dependencyManagement>
@@ -45,12 +45,12 @@
 	<dependencies>
 		<!-- For this example, we will be using the OSGi Blueprint XML syntax for 
 			Apache Camel. -->
-		<!-- 
+		 
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-core</artifactId>
 		</dependency>
-		
+		<!--
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-cxf</artifactId>
@@ -64,11 +64,13 @@
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-camel</artifactId>
 		</dependency>  -->
+		<!-- 
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>${postgresql.version}</version>
 		</dependency>
+		 -->
 		<!-- 
 		<dependency>
 			<groupId>org.springframework</groupId>
