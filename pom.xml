@@ -26,7 +26,7 @@
 		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<fabric8.maven.plugin.version>3.1.80.redhat-000004</fabric8.maven.plugin.version>
-		<!-- <postgresql.version>9.1-901.jdbc4</postgresql.version> -->
+		<postgresql.version>9.1-901.jdbc4</postgresql.version>
 	</properties>
 
 	<dependencyManagement>
@@ -48,7 +48,8 @@
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-core</artifactId>
-		</dependency><!-- 
+		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-cxf</artifactId>
@@ -57,20 +58,19 @@
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jms</artifactId>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-camel</artifactId>
 		</dependency>  -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>${postgresql.version}</version>
-		</dependency> -->
-	<!-- 	<dependency>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-	
-		</dependency> -->
+			<artifactId>spring-jdbc</artifactId>	
+		</dependency>
 		<!-- Karaf microcontainer dependencies -->
 		<dependency>
 			<!-- scope is compile so all features (there is only one) are installed 
@@ -200,8 +200,12 @@
 						<feature>openshift-client</feature>
 						<feature>fabric8-karaf-blueprint</feature>
 						<feature>fabric8-karaf-checks</feature>
-						<!-- <feature>camel-jaxb</feature> <feature>camel-cxf</feature> <feature>camel-jdbc</feature> 
-							<feature>cxf</feature> <feature>camel-http</feature> -->
+						
+						<feature>camel-jaxb</feature> 
+						<feature>camel-cxf</feature> 
+						<feature>camel-jdbc</feature> 
+						<feature>cxf</feature> 
+						<feature>camel-http</feature>
 						<!-- <bundle>wrap:mvn:postgresql/postgresql/${postgresql.version}</bundle> -->	
 					</startupFeatures>
 					<startupBundles>						
